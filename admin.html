@@ -342,7 +342,41 @@ async function loadProducts(){
 
 
 async function saveProduct(){
+const archivo = document.getElementById("imagenArchivo").files[0];
 
+  let imagenURL = "";
+
+  if (archivo) {
+    const nombreArchivo =
+      Date.now() + "-" + archivo.name.replace(/\s+/g, "-");
+
+    const subida = await fetch(
+      SUPABASE_URL +
+      "/storage/v1/object/productos/" +
+      nombreArchivo,
+      {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + accessToken,
+          "Content-Type": archivo.type
+        },
+        body: archivo
+      }
+    );
+
+    if (!subida.ok) {
+      const error = await subida.text();
+      document.getElementById("message").textContent =
+        "❌ Error al subir la imagen: " + error;
+      return;
+    }
+
+    imagenURL =
+      SUPABASE_URL +
+      "/storage/v1/object/public/productos/" +
+      nombreArchivo;
+  }
   const product = {
 
     Nombre:
@@ -356,8 +390,8 @@ async function saveProduct(){
         document.getElementById("precio").value
       ),
 
-    Imagen:
-      document.getElementById("imagen").value,
+    Imagen: imagenURL,
+     
 
     Categoria:
       document.getElementById("categoria").value,
