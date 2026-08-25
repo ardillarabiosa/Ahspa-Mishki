@@ -96,6 +96,13 @@
       overflow: hidden;
       box-shadow: 0 2px 10px #0001;
     }
+    .product {
+  cursor: pointer;
+}
+
+.product .add {
+  cursor: pointer;
+}
 
     .product img {
       width: 100%;
@@ -242,6 +249,44 @@
   <p>Cargando productos...</p>
 </section>
 
+  <div id="productModal" class="modal hidden">
+
+  <div class="cart">
+
+    <div class="cart-header">
+      <h2 id="detailName"></h2>
+
+      <button class="close" id="closeProduct">
+        ✕
+      </button>
+    </div>
+
+    <img
+      id="detailImage"
+      src=""
+      style="width:100%; max-height:400px; object-fit:contain; border-radius:15px; background:#eee;"
+    >
+
+    <p
+      id="detailDescription"
+      style="font-size:16px; color:#555; margin-top:15px;">
+    </p>
+
+    <div
+      id="detailPrice"
+      class="price">
+    </div>
+
+    <button
+      id="detailAdd"
+      class="add">
+      🛒 Agregar al carrito
+    </button>
+
+  </div>
+
+</div>
+  
 <div id="cartModal" class="modal hidden">
 
   <div class="cart">
@@ -386,8 +431,10 @@ function render() {
   document.getElementById("products").innerHTML =
     filtered.map(product => `
 
-      <article class="product">
-
+      <article
+  class="product"
+  onclick="openProduct(${product.id})">
+  
         <img
           src="${
             product.Imagen ||
@@ -431,6 +478,36 @@ function selectCategory(category) {
 
 }
 
+function openProduct(id) {
+
+  const product = products.find(p => p.id === id);
+
+  if (!product) return;
+
+  document.getElementById("detailName").textContent =
+    product.Nombre;
+
+  document.getElementById("detailImage").src =
+    product.Imagen ||
+    "https://placehold.co/500x400?text=Ashpa+Mishki";
+
+  document.getElementById("detailDescription").textContent =
+    product.Descripcion || "Sin descripción.";
+
+  document.getElementById("detailPrice").textContent =
+    money(product.Precio);
+
+  document.getElementById("detailAdd").onclick =
+    function() {
+      addToCart(product.id);
+    };
+
+  document
+    .getElementById("productModal")
+    .classList
+    .remove("hidden");
+
+}
 
 function addToCart(id) {
 
@@ -651,7 +728,20 @@ document
 
     }
   );
+  
+document
+  .getElementById("closeProduct")
+  .addEventListener(
+    "click",
+    () => {
 
+      document
+        .getElementById("productModal")
+        .classList
+        .add("hidden");
+
+    }
+  );
 
 loadProducts();
 
