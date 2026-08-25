@@ -493,7 +493,6 @@ const archivo = document.getElementById("imagenArchivo").files[0];
   loadProducts();
 
 }
-
 async function editProduct(id){
 
   const response = await fetch(
@@ -517,13 +516,22 @@ async function editProduct(id){
 
   const product = products[0];
 
-  const nombre = prompt("Nombre del producto:", product.Nombre);
+  const nombre = prompt(
+    "Nombre del producto:",
+    product.Nombre
+  );
   if(nombre === null) return;
 
-  const precio = prompt("Precio:", product.Precio);
+  const precio = prompt(
+    "Precio:",
+    product.Precio
+  );
   if(precio === null) return;
 
-  const stock = prompt("Stock:", product.Stock);
+  const stock = prompt(
+    "Stock:",
+    product.Stock
+  );
   if(stock === null) return;
 
   const descripcion = prompt(
@@ -538,41 +546,142 @@ async function editProduct(id){
   );
   if(categoria === null) return;
 
-  const update = {
-    Nombre: nombre,
-    Precio: Number(precio),
-    Stock: Number(stock),
-    Descripcion: descripcion,
-    Categoria: categoria
-  };
-
-  const updateResponse = await fetch(
-    SUPABASE_URL +
-    "/rest/v1/ahspamishki?id=eq." +
-    id,
-    {
-      method:"PATCH",
-
-      headers:{
-        "apikey":SUPABASE_KEY,
-        "Authorization":"Bearer " + accessToken,
-        "Content-Type":"application/json",
-        "Prefer":"return=minimal"
-      },
-
-      body:JSON.stringify(update)
-    }
+  const cambiarImagen = confirm(
+    "¿Querés cambiar la imagen?"
   );
 
+  let imagenURL = product.Imagen;
+
+  if(cambiarImagen){
+
+    const input = document.createElement("input");
+
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.click();
+
+    const archivo = await new Promise(resolve => {
+
+      input.onchange = () => {
+        resolve(input.files[0]);
+      };
+
+    });
+
+    if(archivo){
+
+      const nombreArchivo =
+        Date.now() +
+        "-" +
+        archivo.name.replace(/\s+/g, "-");
+
+      const subida = await fetch(
+        SUPABASE_URL +
+        "/storage/v1/object/productos/" +
+        nombreArchivo,
+        {
+          method:"POST",
+
+          headers:{
+            "apikey":SUPABASE_KEY,
+            "Authorization":
+              "Bearer " + accessToken,
+            "Content-Type":
+              archivo.type
+          },
+
+          body:archivo
+        }
+      );
+
+      if(!subida.ok){
+
+        const error =
+          await subida.text();
+
+        alert(
+          "❌ Error al subir imagen: " +
+          error
+        );
+
+        return;
+      }
+
+      imagenURL =
+        SUPABASE_URL +
+        "/storage/v1/object/public/productos/" +
+        nombreArchivo;
+    }
+  }
+
+  const update = {
+
+    Nombre: nombre,
+
+    Precio:
+      Number(precio),
+
+    Stock:
+      Number(stock),
+
+    Descripcion:
+      descripcion,
+
+    Categoria:
+      categoria,
+
+    Imagen:
+      imagenURL
+  };
+
+
+  const updateResponse =
+    await fetch(
+      SUPABASE_URL +
+      "/rest/v1/ahspamishki?id=eq." +
+      id,
+      {
+        method:"PATCH",
+
+        headers:{
+          "apikey":SUPABASE_KEY,
+          "Authorization":
+            "Bearer " + accessToken,
+          "Content-Type":
+            "application/json",
+          "Prefer":
+            "return=minimal"
+        },
+
+        body:
+          JSON.stringify(update)
+      }
+    );
+
+
   if(!updateResponse.ok){
-    const error = await updateResponse.text();
-    alert("Error al actualizar: " + error);
+
+    const error =
+      await updateResponse.text();
+
+    alert(
+      "❌ Error al actualizar: " +
+      error
+    );
+
     return;
   }
 
-  alert("✅ Producto actualizado.");
+
+  alert(
+    "✅ Producto actualizado correctamente."
+  );
 
   loadProducts();
+
+}
+
 }
 async function deleteProduct(id){
 
