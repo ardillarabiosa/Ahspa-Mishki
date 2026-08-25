@@ -1,0 +1,15 @@
+{
+  "name": "Ashpa Mishki",
+  "short_name": "Ashpa Mishki",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#222222",
+  "icons": [
+    {
+      "src": "./logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
