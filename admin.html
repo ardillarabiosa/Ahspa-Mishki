@@ -166,8 +166,19 @@
       <label>Precio</label>
       <input id="precio" type="number">
 
-      <label>Imagen del producto</label>
-<input id="imagenArchivo" type="file" accept="image/*">
+     <label>Imagen del producto</label>
+
+<button type="button" onclick="abrirCamara()">
+  📷 Sacar foto
+</button>
+
+<button type="button" onclick="abrirGaleria()">
+  🖼️ Elegir de galería
+</button>
+
+<input id="imagenCamara" type="file" accept="image/*" capture="environment" style="display:none;">
+
+<input id="imagenArchivo" type="file" accept="image/*" style="display:none;">
 
       <label>Categoría</label>
       <input id="categoria">
@@ -214,7 +225,14 @@ const SUPABASE_KEY =
 
 
 let accessToken = null;
+  
+function abrirCamara(){
+  document.getElementById("imagenCamara").click();
+}
 
+function abrirGaleria(){
+  document.getElementById("imagenArchivo").click();
+}
 
 async function login(){
 
@@ -350,8 +368,10 @@ async function loadProducts(){
 
 
 async function saveProduct(){
-const archivo = document.getElementById("imagenArchivo").files[0];
-
+const archivo =
+  document.getElementById("imagenCamara").files[0] ||
+  document.getElementById("imagenArchivo").files[0];
+  
   let imagenURL = "";
 
   if (archivo) {
