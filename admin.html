@@ -547,75 +547,73 @@ async function editProduct(id){
   if(categoria === null) return;
 
   const cambiarImagen = confirm(
-    "¿Querés cambiar la imagen?"
-  );
+  "¿Querés cambiar la imagen?"
+);
 
-  let imagenURL = product.Imagen;
+let imagenURL = product.Imagen;
 
-  if(cambiarImagen){
+if(cambiarImagen){
 
-    const input = document.createElement("input");
+  const input = document.createElement("input");
 
-    input.type = "file";
-    input.accept = "image/*";
-    input.capture = "environment";
+  input.type = "file";
+  input.accept = "image/*";
 
-    input.click();
+  input.onchange = async function(){
 
-    const archivo = await new Promise(resolve => {
+    const archivo = input.files[0];
 
-      input.onchange = () => {
-        resolve(input.files[0]);
-      };
+    if(!archivo){
+      return;
+    }
 
-    });
+    const nombreArchivo =
+      Date.now() +
+      "-" +
+      archivo.name.replace(/\s+/g, "-");
 
-    if(archivo){
+    const subida = await fetch(
+      SUPABASE_URL +
+      "/storage/v1/object/productos/" +
+      nombreArchivo,
+      {
+        method:"POST",
 
-      const nombreArchivo =
-        Date.now() +
-        "-" +
-        archivo.name.replace(/\s+/g, "-");
+        headers:{
+          "apikey":SUPABASE_KEY,
+          "Authorization":
+            "Bearer " + accessToken,
+          "Content-Type":
+            archivo.type
+        },
 
-      const subida = await fetch(
-        SUPABASE_URL +
-        "/storage/v1/object/productos/" +
-        nombreArchivo,
-        {
-          method:"POST",
+        body:archivo
+      }
+    );
 
-          headers:{
-            "apikey":SUPABASE_KEY,
-            "Authorization":
-              "Bearer " + accessToken,
-            "Content-Type":
-              archivo.type
-          },
+    if(!subida.ok){
 
-          body:archivo
-        }
+      const error =
+        await subida.text();
+
+      alert(
+        "❌ Error al subir imagen: " +
+        error
       );
 
-      if(!subida.ok){
-
-        const error =
-          await subida.text();
-
-        alert(
-          "❌ Error al subir imagen: " +
-          error
-        );
-
-        return;
-      }
-
-      imagenURL =
-        SUPABASE_URL +
-        "/storage/v1/object/public/productos/" +
-        nombreArchivo;
+      return;
     }
-  }
 
+    imagenURL =
+      SUPABASE_URL +
+      "/storage/v1/object/public/productos/" +
+      nombreArchivo;
+
+    alert("✅ Imagen subida correctamente.");
+  };
+
+  input.click();
+}
   const update = {
 
     Nombre: nombre,
