@@ -324,13 +324,19 @@ async function loadProducts(){
 
         <div class="actions">
 
-          <button
-            class="delete"
-            onclick="deleteProduct(${product.id})">
-            🗑️
-          </button>
+  <button
+    class="edit"
+    onclick="editProduct(${product.id})">
+    ✏️
+  </button>
 
-        </div>
+  <button
+    class="delete"
+    onclick="deleteProduct(${product.id})">
+    🗑️
+  </button>
+
+</div>
 
       </div>
 
