@@ -576,10 +576,20 @@ let imagenURL = product.Imagen;
 
 if(cambiarImagen){
 
+  const usarCamara = confirm(
+    "📷 ¿Querés sacar una foto con la cámara?\n\n" +
+    "Aceptar = Cámara\n" +
+    "Cancelar = Galería"
+  );
+
   const input = document.createElement("input");
 
   input.type = "file";
   input.accept = "image/*";
+
+  if(usarCamara){
+    input.capture = "environment";
+  }
 
   input.onchange = async function(){
 
